@@ -10,12 +10,72 @@ import { CategoryFilter } from "@/components/category-filter"
 import { Newsletter } from "@/components/newsletter"
 import { fetchProductsFromSheet } from "@/lib/google-sheet-parser"
 import { Product } from "@/types/product"
+import WelcomeModal from "@/components/WelcomeModal"
+import { CategoryNavigation } from "@/components/category-navigation"
+import { SearchBox } from "@/components/search-box"
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
   const products: Product[] = await fetchProductsFromSheet();
+  const currentTab = searchParams.tab as string || 'all';
+  const searchQuery = searchParams.q as string || '';
+  
+  // Filter products based on the tab and search query
+  const filteredProducts = (() => {
+    // First filter by category/merchant
+    let filtered = products;
+    
+    switch (currentTab) {
+      case 'amazon':
+        filtered = products.filter(p => p.merchant.toLowerCase() === 'amazon');
+        break;
+      case 'flipkart':
+        filtered = products.filter(p => p.merchant.toLowerCase() === 'flipkart');
+        break;
+      case 'electronics':
+        filtered = products.filter(p => p.category.toLowerCase() === 'electronics');
+        break;
+      case 'fashion':
+        filtered = products.filter(p => p.category.toLowerCase() === 'fashion');
+        break;
+    }
+    
+    // Then apply search filter if there's a query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(product => 
+        product.title.toLowerCase().includes(query) || 
+        product.description.toLowerCase().includes(query) ||
+        product.merchant.toLowerCase().includes(query) ||
+        product.category.toLowerCase().includes(query)
+      );
+    }
+    
+    return filtered;
+  })();
+
+  // Get the headline based on current filters
+  const getHeadline = () => {
+    if (searchQuery) {
+      return `Search Results: "${searchQuery}"`;
+    }
+    
+    switch (currentTab) {
+      case 'all': return 'Trending Deals';
+      case 'amazon': return 'Amazon Deals';
+      case 'flipkart': return 'Flipkart Deals';
+      case 'electronics': return 'Electronics Deals';
+      case 'fashion': return 'Fashion Deals';
+      default: return 'Featured Deals';
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
+      <WelcomeModal />
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
           <div className="flex gap-6 md:gap-10">
@@ -25,101 +85,28 @@ export default async function Home() {
               </div>
               <span className="inline-block font-bold">DealsHub</span>
             </Link>
-            <nav className="hidden gap-6 md:flex">
-              <Link
-                href="#"
-                className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
-              >
-                Amazon
-              </Link>
-              <Link
-                href="#"
-                className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
-              >
-                Flipkart
-              </Link>
-              <Link
-                href="#"
-                className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
-              >
-                Best Offers
-              </Link>
-              <Link
-                href="#"
-                className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
-              >
-                Trending
-              </Link>
-            </nav>
+            <CategoryNavigation />
           </div>
           <div className="flex flex-1 items-center justify-end space-x-4">
             <div className="w-full flex-1 md:w-auto md:flex-none">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search deals..."
-                  className="w-full rounded-lg bg-background pl-8 md:w-[300px] lg:w-[400px]"
-                />
-              </div>
+              <SearchBox defaultValue={searchQuery} />
             </div>
           </div>
         </div>
       </header>
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-16 bg-gradient-to-r from-rose-50 to-teal-50 dark:from-rose-950/20 dark:to-teal-950/20">
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-              <div className="flex flex-col justify-center space-y-4">
-                <div className="space-y-2">
-                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    Discover Amazing Deals & Save Big
-                  </h1>
-                  <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    Find the best offers from Amazon, Flipkart, and other top retailers all in one place.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Button size="lg">Today&apos;s Top Deals</Button>
-                  <Button size="lg" variant="outline">
-                    Browse Categories
-                  </Button>
-                </div>
-              </div>
-              <div className="flex items-center justify-center">
-                <div className="relative h-[300px] w-full overflow-hidden rounded-xl md:h-[400px]">
-                  <Image
-                    src="/banner.png?height=400&width=800"
-                    alt="Featured deals"
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
         <section className="container px-4 py-8 md:px-6 md:py-12">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Today&apos;s Hottest Deals</h2>
-              <p className="text-muted-foreground">Handpicked offers that you don&apos;t want to miss</p>
-            </div>
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
+              {getHeadline()}
+            </h2>
             <CategoryFilter />
           </div>
-          <Tabs defaultValue="all" className="w-full">
-            <TabsList className="mb-6">
-              <TabsTrigger value="all">All Deals</TabsTrigger>
-              <TabsTrigger value="amazon">Amazon</TabsTrigger>
-              <TabsTrigger value="flipkart">Flipkart</TabsTrigger>
-              <TabsTrigger value="electronics">Electronics</TabsTrigger>
-              <TabsTrigger value="fashion">Fashion</TabsTrigger>
-            </TabsList>
-            <TabsContent value="all" className="space-y-4">
-              {products.length > 0 ? (
+          <div className="w-full">
+            <div className="space-y-4">
+              {filteredProducts.length > 0 ? (
               <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {products.map((product) => (
+                  {filteredProducts.map((product) => (
                 <DealCard
                       key={product.id}
                       title={product.title}
@@ -135,105 +122,32 @@ export default async function Home() {
                   ))}
               </div>
               ) : (
-                <p className="text-center text-muted-foreground">No deals found. Check back later!</p>
+                <div className="text-center py-12">
+                  <h3 className="text-xl font-medium mb-2">No deals found</h3>
+                  <p className="text-muted-foreground">
+                    {searchQuery 
+                      ? `We couldn't find any deals matching "${searchQuery}".` 
+                      : "No deals found for this category."
+                    }
+                  </p>
+                  {searchQuery && (
+                    <Button variant="link" asChild className="mt-4">
+                      <Link href={currentTab === 'all' ? '/' : `/?tab=${currentTab}`}>
+                        Clear search
+                      </Link>
+                    </Button>
+                  )}
+                </div>
               )}
-              {products.length > 0 && (
+              {filteredProducts.length > 0 && (
               <div className="flex justify-center mt-8">
                 <Button variant="outline" size="lg">
                   Load More Deals
                 </Button>
               </div>
               )}
-            </TabsContent>
-            <TabsContent value="amazon" className="space-y-4">
-              {products.filter(p => p.merchant.toLowerCase() === 'amazon').length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                 {products.filter(p => p.merchant.toLowerCase() === 'amazon').map((product) => (
-                <DealCard
-                       key={product.id}
-                       title={product.title}
-                       description={product.description}
-                       originalPrice={product.originalPrice}
-                       salePrice={product.salePrice}
-                       discount={product.discount || ""}
-                       image={product.imageUrl || "/logo.png?height=300&width=300"}
-                       merchant={product.merchant}
-                       category={product.category}
-                       productLink={product.productLink}
-                     />
-                   ))}
-              </div>
-              ) : (
-                <p className="text-center text-muted-foreground">No Amazon deals found. Check back later!</p>
-              )}
-            </TabsContent>
-            <TabsContent value="flipkart" className="space-y-4">
-              {products.filter(p => p.merchant.toLowerCase() === 'flipkart').length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {products.filter(p => p.merchant.toLowerCase() === 'flipkart').map((product) => (
-                <DealCard
-                        key={product.id}
-                        title={product.title}
-                        description={product.description}
-                        originalPrice={product.originalPrice}
-                        salePrice={product.salePrice}
-                        discount={product.discount || ""}
-                        image={product.imageUrl || "/logo.png?height=300&width=300"}
-                        merchant={product.merchant}
-                        category={product.category}
-                        productLink={product.productLink}
-                      />
-                    ))}
-              </div>
-              ) : (
-                <p className="text-center text-muted-foreground">No Flipkart deals found. Check back later!</p>
-              )}
-            </TabsContent>
-            <TabsContent value="electronics" className="space-y-4">
-              {products.filter(p => p.category.toLowerCase() === 'electronics').length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {products.filter(p => p.category.toLowerCase() === 'electronics').map((product) => (
-                <DealCard
-                        key={product.id}
-                        title={product.title}
-                        description={product.description}
-                        originalPrice={product.originalPrice}
-                        salePrice={product.salePrice}
-                        discount={product.discount || ""}
-                        image={product.imageUrl || "/logo.png?height=300&width=300"}
-                        merchant={product.merchant}
-                        category={product.category}
-                        productLink={product.productLink}
-                      />
-                    ))}
-              </div>
-              ) : (
-                <p className="text-center text-muted-foreground">No electronics deals found. Check back later!</p>
-              )}
-            </TabsContent>
-            <TabsContent value="fashion" className="space-y-4">
-              {products.filter(p => p.category.toLowerCase() === 'fashion').length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {products.filter(p => p.category.toLowerCase() === 'fashion').map((product) => (
-                <DealCard
-                        key={product.id}
-                        title={product.title}
-                        description={product.description}
-                        originalPrice={product.originalPrice}
-                        salePrice={product.salePrice}
-                        discount={product.discount || ""}
-                        image={product.imageUrl || "/logo.png?height=300&width=300"}
-                        merchant={product.merchant}
-                        category={product.category}
-                        productLink={product.productLink}
-                      />
-                    ))}
-              </div>
-              ) : (
-                <p className="text-center text-muted-foreground">No fashion deals found. Check back later!</p>
-              )}
-            </TabsContent>
-          </Tabs>
+            </div>
+          </div>
         </section>
         <section className="w-full py-12 md:py-24 lg:py-16 bg-muted">
           <div className="container px-4 md:px-6">
