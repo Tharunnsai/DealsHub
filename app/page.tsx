@@ -101,7 +101,7 @@ export default async function Home({
         </div>
       </header>
       <main className="flex-1">
-        <section className="container px-4 py-8 md:px-6 md:py-12">
+        <section id="products-section" className="container px-4 py-8 md:px-6 md:py-12">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
               {getHeadline()}
@@ -152,8 +152,8 @@ export default async function Home({
                 </Button>
               </div>
               )}
-            </div>
-          </div>
+              </div>
+              </div>
         </section>
         <section className="w-full py-12 md:py-24 lg:py-16 bg-muted">
           <div className="container px-4 md:px-6">
@@ -214,7 +214,9 @@ export default async function Home({
             </div>
           </div>
         </section>
+        <section id="newsletter-section" className="w-full py-12 md:py-24 lg:py-16 bg-gradient-to-r from-rose-50 to-teal-50 dark:from-rose-950/20 dark:to-teal-950/20">
         <Newsletter />
+        </section>
       </main>
       <footer className="w-full border-t bg-background py-6 md:py-0">
         <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">

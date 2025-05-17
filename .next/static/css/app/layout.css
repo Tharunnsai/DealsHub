@@ -897,8 +897,8 @@ video {
 .h-\[1px\] {
   height: 1px;
 }
-.h-\[300px\] {
-  height: 300px;
+.h-\[200px\] {
+  height: 200px;
 }
 .h-\[80vh\] {
   height: 80vh;
@@ -1311,10 +1311,6 @@ video {
 .rounded-t-\[10px\] {
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
-}
-.rounded-t-xl {
-  border-top-left-radius: 0.75rem;
-  border-top-right-radius: 0.75rem;
 }
 .rounded-tl-sm {
   border-top-left-radius: calc(var(--radius) - 4px);
@@ -3017,8 +3013,8 @@ video {
     height: 6rem;
   }
 
-  .md\:h-\[400px\] {
-    height: 400px;
+  .md\:h-\[300px\] {
+    height: 300px;
   }
 
   .md\:w-\[300px\] {
