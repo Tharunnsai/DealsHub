@@ -17,11 +17,17 @@ import { SearchBox } from "@/components/search-box"
 export default async function Home({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: { [key: string]: string | string[] | undefined } | Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const products: Product[] = await fetchProductsFromSheet();
-  const currentTab = searchParams.tab as string || 'all';
-  const searchQuery = searchParams.q as string || '';
+  let paramsObj: { [key: string]: string | string[] | undefined };
+  if (typeof searchParams === 'object' && typeof (searchParams as any).then === 'function') {
+    paramsObj = await searchParams as { [key: string]: string | string[] | undefined };
+  } else {
+    paramsObj = searchParams as { [key: string]: string | string[] | undefined };
+  }
+  const currentTab = paramsObj.tab as string || 'all';
+  const searchQuery = paramsObj.q as string || '';
   
   // Filter products based on the tab and search query
   const filteredProducts = (() => {

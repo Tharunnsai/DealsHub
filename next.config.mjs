@@ -8,7 +8,12 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    domains: [
+      "rukminim2.flixcart.com",
+      "https://m.media-amazon.com/"
+      // add any other domains you need
+    ],
   },
-}
+} 
 
 export default nextConfig
