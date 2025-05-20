@@ -107,13 +107,15 @@ export function Newsletter() {
   }
 
   return (
-    <section className="w-full py-12 md:py-24 lg:py-16 bg-gradient-to-r from-rose-50 to-teal-50 dark:from-rose-950/20 dark:to-teal-950/20">
+    <section className="w-full py-12 md:py-24 lg:py-16 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl">Never Miss a Deal</h2>
-            <p className="max-w-[600px] text-muted-foreground md:text-xl">
-              Subscribe to our newsletter and get the best deals delivered to your inbox daily.
+            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Never Miss an Exclusive Offer
+            </h2>
+            <p className="max-w-[600px] text-muted-foreground md:text-lg">
+              Subscribe to our newsletter and be the first to know about our luxury collections and special promotions.
             </p>
           </div>
           <div className="w-full max-w-md space-y-2">
@@ -125,39 +127,40 @@ export function Newsletter() {
                 </AlertDescription>
               </Alert>
             ) : (
-              <form onSubmit={handleSubmit} className="flex w-full max-w-sm items-center space-x-2 mx-auto">
+              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
                 <div className="flex-1">
-                  <Input 
-                    type="email" 
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
                     value={email}
-                    onChange={handleEmailChange}
-                    placeholder="Enter your email" 
-                    className={`max-w-lg w-full ${!isValid ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
-                    aria-invalid={!isValid}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      setIsValid(true)
+                    }}
+                    className={`w-full h-12 rounded-xl border-2 ${
+                      !isValid ? 'border-red-500' : 'border-purple-200 dark:border-purple-800'
+                    }`}
                   />
-                  {!isValid && (
-                    <p className="text-xs text-red-500 mt-1 text-left">Please enter a valid email address</p>
-                  )}
                 </div>
                 <Button 
                   type="submit" 
-                  disabled={!email || !isValid || submitState === 'loading'}
+                  disabled={submitState === 'loading'}
+                  className="h-12 px-6 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-xl"
                 >
                   {submitState === 'loading' ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Submitting
-                    </>
+                    <div className="flex items-center gap-2">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      <span>Subscribing...</span>
+                    </div>
                   ) : (
-                    <>
-                      <Mail className="mr-2 h-4 w-4" />
-                      Subscribe
-                    </>
+                    'Subscribe'
                   )}
                 </Button>
               </form>
             )}
-            <p className="text-xs text-muted-foreground">We respect your privacy. Unsubscribe at any time.</p>
+            <p className="text-xs text-muted-foreground text-center">
+              We respect your privacy. Unsubscribe at any time.
+            </p>
           </div>
         </div>
       </div>

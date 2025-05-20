@@ -86,10 +86,10 @@ export default async function Home({
         <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
           <div className="flex gap-6 md:gap-10">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground text-sm font-bold">D</span>
+              <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center">
+                <span className="text-white text-sm font-bold">MC</span>
               </div>
-              <span className="inline-block font-bold">DealsHub</span>
+              <span className="inline-block font-bold text-lg">Montague Crest</span>
             </Link>
             <CategoryNavigation />
           </div>
