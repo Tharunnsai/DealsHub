@@ -6,7 +6,7 @@ import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function WelcomeModal() {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
   // Prevent background scroll when modal is open
   useEffect(() => {
